@@ -1,0 +1,38 @@
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.swp
+tags
+.nvmrc
+
+pids
+/logs
+/dist
+
+# Coverage reports
+coverage
+
+# API keys and secrets
+.server.env
+.client.env
+
+# Dependency directory
+node_modules
+
+# Editors
+.vscode
+.idea
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+dist
+.migrate
+builds

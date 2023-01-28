@@ -1,0 +1,34 @@
+{
+  "name": "ws-demo-b2broker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && tsc-alias && node ./dist/server/index.js",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc && tsc-alias",
+    "build": "tsc && tsc-alias",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "@types/uuid": "^9.0.0",
+    "@types/ws": "^8.5.4",
+    "gts": "^3.1.1",
+    "tsc-alias": "^1.8.2",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "log4js": "^6.7.1",
+    "uuid": "^9.0.0",
+    "ws": "^8.12.0"
+  }
+}
