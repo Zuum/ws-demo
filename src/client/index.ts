@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv';
+dotenv.config({path: './.client.env'});
+
 import 'logger';
 
 import {WebsocketClient} from 'client/websocket/WebsocketClient';
 import {ERequestType} from '../types/ERequestType';
-
-dotenv.config({path: './.client.env'});
 
 const client = new WebsocketClient({
   connectionString:
@@ -13,9 +13,9 @@ const client = new WebsocketClient({
 });
 
 async function doStuff() {
-  await client.requestCommand(ERequestType.SUBSCRIBE);
-  await client.requestCommand(ERequestType.COUNT_SUBSCRIBERS);
-  await client.requestCommand(ERequestType.UNSUBSCRIBE);
+  console.log(await client.requestCommand(ERequestType.SUBSCRIBE));
+  console.log(await client.requestCommand(ERequestType.COUNT_SUBSCRIBERS));
+  console.log(await client.requestCommand(ERequestType.UNSUBSCRIBE));
 }
 
 setTimeout(doStuff, 1000);

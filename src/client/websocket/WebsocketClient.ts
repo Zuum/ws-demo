@@ -6,6 +6,8 @@ import {IGenericResponse} from 'types/IGenericResponse';
 import {v4 as uuidv4} from 'uuid';
 import {EResponseType} from '../../types/EResponseType';
 import {IErrorResponse} from '../../types/responses/IErrorResponse';
+import {REQUEST_TIMED_OUT} from '../../server/websocket/errors';
+import Timeout = NodeJS.Timeout;
 
 type Executor = (
   value: IGenericResponse | PromiseLike<IGenericResponse>
@@ -16,7 +18,9 @@ type MessageHandler = (data: RawData) => void;
 export class WebsocketClient {
   private connection: WebSocket;
   private pendingRequests: Map<string, Executor> = new Map<string, Executor>();
+  private pendingTimeouts: Map<string, number> = new Map<string, number>();
   private config: IWSClientConfig;
+  private bufferedSends: IGenericRequest[] = [];
 
   constructor(params: IWSClientConfig) {
     this.connection = new WebSocket(params.connectionString);
@@ -28,6 +32,7 @@ export class WebsocketClient {
   private send(payload: IGenericRequest): void {
     if (this.connection.readyState !== this.connection.OPEN) {
       console.warn('WSClient send requested while socket is not ready');
+      this.bufferedSends.push(payload);
       return;
     }
     const serializedPayload = JSON.stringify(payload);
@@ -61,27 +66,36 @@ export class WebsocketClient {
   }
 
   private subscribeToEmitter() {
-    this.connection.on('message', data => {
-      const deserialied = this.parseMessage(data);
-      // TODO: for tracing purposes
-      console.log(deserialied);
+    this.connection.on('open', () => {
+      this.bufferedSends.forEach(payload => {
+        this.send(payload);
+      });
+    });
 
-      if (deserialied.id) {
-        const executor = this.pendingRequests.get(deserialied.id);
+    this.connection.on('message', data => {
+      const deserialized = this.parseMessage(data);
+      const {id} = deserialized;
+
+      if (id) {
+        const executor = this.pendingRequests.get(id);
         if (executor) {
-          executor(deserialied);
-          this.pendingRequests.delete(deserialied.id);
+          executor(deserialized);
+          clearTimeout(this.pendingTimeouts.get(id));
+          this.clearPendingMaps(id);
         }
       }
     });
 
-    this.connection.on('close', (code, reason) => {
-      console.log('ConnectionClosed');
-    });
+    this.connection.on('close', (code, reason) => {});
 
     this.connection.on('error', error => {
       console.error(error);
     });
+  }
+
+  private clearPendingMaps(id: string) {
+    this.pendingTimeouts.delete(id);
+    this.pendingRequests.delete(id);
   }
 
   public async requestCommand(type: ERequestType): Promise<IGenericResponse> {
@@ -91,19 +105,28 @@ export class WebsocketClient {
       id,
     });
 
-    const newPromise = new Promise<IGenericResponse>(resolve => {
+    const waitForResponseOrTimeout = new Promise<IGenericResponse>(resolve => {
       this.pendingRequests.set(id, resolve);
+      const clearPendingMaps = this.clearPendingMaps.bind(this);
+
+      const sendTimeoutResult = (payload: IErrorResponse) => {
+        clearPendingMaps(id);
+        resolve(payload);
+      };
+
+      const timeout = setTimeout(
+        sendTimeoutResult,
+        this.config.requestTimeoutMs,
+        REQUEST_TIMED_OUT(id)
+      );
+
+      this.pendingTimeouts.set(id, timeout);
     });
 
-    const timeoutPromise = new Promise<IErrorResponse>(resolve => {
-      setTimeout(resolve, this.config.requestTimeoutMs, {
-        id,
-        type: EResponseType.ERROR,
-        updatedAt: 0,
-        error: 'Timeout while waiting for response',
-      });
-    });
+    return waitForResponseOrTimeout;
+  }
 
-    return Promise.race([newPromise, timeoutPromise]);
+  public disconnect() {
+    this.connection.terminate();
   }
 }

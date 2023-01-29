@@ -22,7 +22,7 @@ export const processMessage = async (
 ): Promise<IGenericResponse> => {
   const controller = messageTypeToHandler.get(params.message.type);
   if (!controller) {
-    return METHOD_NOT_FOUND();
+    return METHOD_NOT_FOUND(params.message.id);
   }
   try {
     const result: IGenericResponse = await controller(params);
@@ -31,6 +31,6 @@ export const processMessage = async (
     return result;
   } catch (error) {
     console.error(error);
-    return UNKNOWN_ERROR();
+    return UNKNOWN_ERROR(params.message.id);
   }
 };

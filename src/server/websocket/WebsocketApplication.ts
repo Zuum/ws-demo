@@ -6,18 +6,20 @@ import {SocketConnection} from 'server/websocket/SocketConnection';
 import {IConfig} from 'server/websocket/types/IConfig';
 import EventEmitter from 'events';
 import {Waiter} from 'server/websocket/helpers/waiter';
+import Timeout = NodeJS.Timeout;
 
 export class WebsocketApplication {
   private server: WebSocketServer;
   private port: number;
   private config: IConfig;
   private pinger: EventEmitter;
+  private pingTimeout: Timeout | undefined;
 
   constructor(settings: IConfig) {
-    this.port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+    this.port = settings.port;
     this.server = new WebSocketServer({
       port: this.port,
-      path: '/ws',
+      path: settings.path,
     });
 
     this.config = settings;
@@ -61,10 +63,28 @@ export class WebsocketApplication {
     this.server.on('listening', () => {
       console.log(`Websocket listening on port ${this.port}`);
     });
+
+    this.server.on('close', () => {});
   }
 
   private pingAllClients() {
     this.pinger.emit('ping', Date.now());
-    setTimeout(() => this.pingAllClients(), this.config.pingIntervalMs);
+    this.pingTimeout = setTimeout(
+      () => this.pingAllClients(),
+      this.config.pingIntervalMs
+    );
+  }
+
+  public async stopServer(): Promise<void> {
+    return new Promise(resolve => {
+      this.server.close(() => {
+        this.server.clients.forEach(client => {
+          client.close();
+        });
+        this.pinger.removeAllListeners('ping');
+        clearTimeout(this.pingTimeout);
+      });
+      resolve();
+    });
   }
 }

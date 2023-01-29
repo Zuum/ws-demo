@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": "./src/",
     "module": "commonjs",
     "target": "ES2015",
     "moduleResolution": "node",
@@ -11,23 +11,24 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "typeRoots": [
       "./node_modules/@types/"
     ],
     "paths": {
       "client": [
-        "client/*"
+        "src/client/*"
       ],
       "server": [
-        "server/*"
+        "src/server/*"
       ],
       "types": [
-        "types/*"
+        "src/types/*"
       ],
       "logger": [
-        "logger/*"
+        "src/logger/*"
       ]
     }
   },
@@ -37,5 +38,6 @@
   ],
   "include": [
     "src/**/*.ts",
+    "test/**/*.test.ts"
   ]
 }

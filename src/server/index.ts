@@ -4,7 +4,10 @@ import 'logger';
 
 import {WebsocketApplication} from 'server/websocket/WebsocketApplication';
 
-new WebsocketApplication({
+const app = new WebsocketApplication({
+  // ensuring 3000 if PORT is true, but parses to NaN
+  port: parseInt(process.env.PORT || '3000', 10) || 3000,
+  path: process.env.SOCKET_PATH || '/ws',
   pingIntervalMs: 1000,
   subscribeWaitMs: 4000,
   unsubscribeWaitMs: 8000,

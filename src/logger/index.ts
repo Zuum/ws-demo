@@ -11,7 +11,7 @@ log4js.configure({
 });
 
 const logger = log4js.getLogger(`[${process.env.NODE_SERVICE_NAME}]`);
-logger.level = 'all';
+logger.level = process.env.LOG_LEVEL || log4js.levels.OFF;
 
 (function () {
   console.error = function (errMessage) {
