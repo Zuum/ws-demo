@@ -1,7 +1,7 @@
-import {IMessageMetadata} from 'server/websocket/types/IMessageMetadata';
-import {IGenericRequest} from 'server/websocket/types/IGenericRequest';
+import {IMetadata} from 'server/websocket/types/IMetadata';
+import {IGenericRequest} from 'types/IGenericRequest';
 
 export interface IMessageWithMetadata {
-  meta: IMessageMetadata;
+  meta: IMetadata;
   message: IGenericRequest;
 }

@@ -1,12 +1,13 @@
 import WebSocket from 'ws';
 import {StoreSingleton} from 'server/store';
 import {v4 as uuidv4} from 'uuid';
-import {IGenericResponse} from 'server/websocket/types/IGenericResponse';
+import {IGenericResponse} from 'types/IGenericResponse';
 import {JSON_PARSE_ERROR} from 'server/websocket/errors';
-import {IGenericRequest} from 'server/websocket/types/IGenericRequest';
+import {IGenericRequest} from 'types/IGenericRequest';
 import {processMessage} from 'server/websocket/message-router';
-import {IMessageMetadata} from 'server/websocket/types/IMessageMetadata';
-import {EResponseType} from './types/EResponseType';
+import {IMetadata} from 'server/websocket/types/IMetadata';
+import {EResponseType} from 'types/EResponseType';
+import EventEmitter from 'events';
 
 export class SocketConnection {
   private socket: WebSocket;
@@ -24,11 +25,23 @@ export class SocketConnection {
   }
 
   private send(payload: IGenericResponse) {
+    if (this.socket.readyState !== this.socket.OPEN) {
+      console.warn('Server attempting to send on not ready socket');
+      return;
+    }
     const serializedPayload = JSON.stringify(payload);
     this.socket.send(serializedPayload);
   }
 
-  public ping(timestamp: number): void {
+  public subscribeToPing(pinger: EventEmitter): void {
+    const pingHandler = this.sendPingMessage.bind(this);
+    pinger.on('ping', pingHandler);
+    this.socket.once('close', (code, reason) => {
+      pinger.removeListener('ping', pingHandler);
+    });
+  }
+
+  private sendPingMessage(timestamp: number): void {
     this.send({
       type: EResponseType.HEARTBEAT,
       updatedAt: timestamp,
@@ -36,7 +49,7 @@ export class SocketConnection {
   }
 
   private subscribeToEmitter() {
-    const meta: IMessageMetadata = {id: this.id};
+    const meta: IMetadata = {id: this.id};
     this.socket.on('message', async data => {
       const rawData: string = data.toString();
       let message: IGenericRequest;
@@ -51,7 +64,7 @@ export class SocketConnection {
       this.send(result);
     });
 
-    this.socket.on('close', (code, reason) => {
+    this.socket.once('close', (code, reason) => {
       StoreSingleton.getInstance().removeConnection(this.id);
     });
 

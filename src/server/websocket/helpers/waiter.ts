@@ -1,4 +1,4 @@
-import {ERequestType} from 'server/websocket/types/ERequestType';
+import {ERequestType} from 'types/ERequestType';
 
 export class Waiter {
   private static subscribeWaitMs = 0;

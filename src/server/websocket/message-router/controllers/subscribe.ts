@@ -1,13 +1,10 @@
 import {StoreSingleton} from 'server/store';
-import {IGenericResponse} from 'server/websocket/types/IGenericResponse';
-import {EResponseType} from 'server/websocket/types/EResponseType';
+import {EResponseType} from 'types/EResponseType';
 import {IMessageWithMetadata} from 'server/websocket/types/IMessageWithMetadata';
+import {ISubscribeResponse} from 'types/responses/ISubscribeResponse';
+import {IController} from 'server/websocket/types/IController';
 
-interface ISubscribeResponse extends IGenericResponse {
-  status: string;
-}
-
-export const subscribe = async (
+export const subscribe: IController = async (
   params: IMessageWithMetadata
 ): Promise<ISubscribeResponse> => {
   const timestamp = StoreSingleton.getInstance().subscribeAndTimestamp(

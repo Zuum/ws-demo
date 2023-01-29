@@ -1,9 +1,5 @@
-import {EResponseType} from 'server/websocket/types/EResponseType';
-import {IGenericResponse} from 'server/websocket/types/IGenericResponse';
-
-interface IErrorResponse extends IGenericResponse {
-  error: string;
-}
+import {EResponseType} from 'types/EResponseType';
+import {IErrorResponse} from 'types/responses/IErrorResponse';
 
 export const JSON_PARSE_ERROR = (): IErrorResponse => {
   return {

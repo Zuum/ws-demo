@@ -1,4 +1,4 @@
-import {EResponseType} from 'server/websocket/types/EResponseType';
+import {EResponseType} from 'types/EResponseType';
 
 export interface IGenericResponse {
   type: EResponseType;

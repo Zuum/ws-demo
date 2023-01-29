@@ -5,7 +5,7 @@ import * as net from 'net';
 import {SocketConnection} from 'server/websocket/SocketConnection';
 import {IConfig} from 'server/websocket/types/IConfig';
 import EventEmitter from 'events';
-import {Waiter} from './helpers/waiter';
+import {Waiter} from 'server/websocket/helpers/waiter';
 
 export class WebsocketApplication {
   private server: WebSocketServer;
@@ -40,9 +40,7 @@ export class WebsocketApplication {
   private subscribeToEmitter() {
     this.server.on('connection', (ws: WebSocket) => {
       const newConnection = new SocketConnection(ws);
-      this.pinger.on('ping', timestamp => {
-        newConnection.ping(timestamp);
-      });
+      newConnection.subscribeToPing(this.pinger);
     });
 
     this.server.on('error', (error: Error) => {

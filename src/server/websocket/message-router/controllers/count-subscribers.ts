@@ -1,13 +1,10 @@
 import {StoreSingleton} from 'server/store';
-import {IGenericResponse} from 'server/websocket/types/IGenericResponse';
-import {EResponseType} from 'server/websocket/types/EResponseType';
+import {EResponseType} from 'types/EResponseType';
 import {IMessageWithMetadata} from 'server/websocket/types/IMessageWithMetadata';
+import {ICountSubscribersResponse} from 'types/responses/ICountSubscribersResponse';
+import {IController} from 'server/websocket/types/IController';
 
-interface ICountSubscribersResponse extends IGenericResponse {
-  count: number;
-}
-
-export const countSubscribers = async (
+export const countSubscribers: IController = async (
   params: IMessageWithMetadata
 ): Promise<ICountSubscribersResponse> => {
   const count = StoreSingleton.getInstance().countConnections();
