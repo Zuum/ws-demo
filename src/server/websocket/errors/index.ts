@@ -26,12 +26,3 @@ export const UNKNOWN_ERROR = (id: string): IErrorResponse => {
     id,
   };
 };
-
-export const REQUEST_TIMED_OUT = (id: string): IErrorResponse => {
-  return {
-    id,
-    type: EResponseType.ERROR,
-    updatedAt: 0,
-    error: 'Timeout while waiting for response',
-  };
-};

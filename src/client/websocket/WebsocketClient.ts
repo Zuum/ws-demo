@@ -4,10 +4,9 @@ import {IGenericRequest} from 'types/IGenericRequest';
 import {ERequestType} from 'types/ERequestType';
 import {IGenericResponse} from 'types/IGenericResponse';
 import {v4 as uuidv4} from 'uuid';
-import {EResponseType} from '../../types/EResponseType';
-import {IErrorResponse} from '../../types/responses/IErrorResponse';
-import {REQUEST_TIMED_OUT} from '../../server/websocket/errors';
-import Timeout = NodeJS.Timeout;
+import {EResponseType} from 'types/EResponseType';
+import {IErrorResponse} from 'types/responses/IErrorResponse';
+import {REQUEST_TIMED_OUT} from 'client/errors';
 
 type Executor = (
   value: IGenericResponse | PromiseLike<IGenericResponse>

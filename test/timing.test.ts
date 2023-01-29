@@ -12,8 +12,9 @@ import {WebsocketClient} from 'client/websocket/WebsocketClient';
 import {ERequestType} from 'types/ERequestType';
 import {RawData} from 'ws';
 import {EResponseType} from 'types/EResponseType';
-import {IErrorResponse} from '../src/types/responses/IErrorResponse';
-import {REQUEST_TIMED_OUT} from '../src/server/websocket/errors';
+import {IErrorResponse} from 'types/responses/IErrorResponse';
+
+const PORT = 3005;
 
 describe('Validating proper timings on messages', () => {
   let server: WebsocketApplication;
@@ -22,7 +23,7 @@ describe('Validating proper timings on messages', () => {
 
   beforeAll(() => {
     server = new WebsocketApplication({
-      port: 3000,
+      port: PORT,
       path: '/ws',
       pingIntervalMs: 1000,
       subscribeWaitMs: 4000,
@@ -34,11 +35,11 @@ describe('Validating proper timings on messages', () => {
 
   beforeEach(() => {
     clientLongTimeout = new WebsocketClient({
-      connectionString: 'ws://localhost:3000/ws',
+      connectionString: `ws://localhost:${PORT}/ws`,
       requestTimeoutMs: 10000,
     });
     clientFastTimeout = new WebsocketClient({
-      connectionString: 'ws://localhost:3000/ws',
+      connectionString: `ws://localhost:${PORT}/ws`,
       requestTimeoutMs: 1000,
     });
   });
@@ -109,6 +110,6 @@ describe('Validating proper timings on messages', () => {
     expect(Math.abs(end - start)).toBeGreaterThan(1000);
     expect(Math.abs(end - start)).toBeLessThan(1100);
     expect(result.type).toEqual(EResponseType.ERROR);
-    expect(result.error).toEqual(REQUEST_TIMED_OUT('0').error);
+    expect(result.error).toEqual('Timeout while waiting for response');
   });
 });

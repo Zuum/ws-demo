@@ -6,14 +6,13 @@ import {SocketConnection} from 'server/websocket/SocketConnection';
 import {IConfig} from 'server/websocket/types/IConfig';
 import EventEmitter from 'events';
 import {Waiter} from 'server/websocket/helpers/waiter';
-import Timeout = NodeJS.Timeout;
 
 export class WebsocketApplication {
   private server: WebSocketServer;
   private port: number;
   private config: IConfig;
   private pinger: EventEmitter;
-  private pingTimeout: Timeout | undefined;
+  private pingTimeout: NodeJS.Timeout | undefined;
 
   constructor(settings: IConfig) {
     this.port = settings.port;
