@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && tsc-alias && node ./dist/server/index.js",
+    "start:server": "tsc && tsc-alias && node ./dist/server/index.js",
+    "start:client": "tsc && tsc-alias && node ./dist/client/index.js",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc && tsc-alias",

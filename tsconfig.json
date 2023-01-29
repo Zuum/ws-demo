@@ -25,6 +25,9 @@
       ],
       "types": [
         "types/*"
+      ],
+      "logger": [
+        "logger/*"
       ]
     }
   },

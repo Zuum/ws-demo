@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config({path: './.server.env'});
-import 'server/logger';
+import 'logger';
 
 import {WebsocketApplication} from 'server/websocket/WebsocketApplication';
 

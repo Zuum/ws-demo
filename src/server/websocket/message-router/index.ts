@@ -26,6 +26,7 @@ export const processMessage = async (
   }
   try {
     const result: IGenericResponse = await controller(params);
+    result.id = params.message.id;
     await Waiter.wait(params.message.type);
     return result;
   } catch (error) {
